@@ -33,7 +33,7 @@ func (s *Server) handler() http.Handler {
 			BasePath: s.BasePath,
 			Username: s.Username,
 			Password: s.Password,
-			Public:   "/static",
+			Public:   []string{"/static", "/fever"},
 		}
 		r.Use(a.Handler)
 	}
@@ -56,6 +56,7 @@ func (s *Server) handler() http.Handler {
 	r.For("/opml/export", s.handleOPMLExport)
 	r.For("/page", s.handlePageCrawl)
 	r.For("/logout", s.handleLogout)
+	r.For("/fever/", s.handleFever)
 
 	return r
 }
@@ -353,7 +354,7 @@ func (s *Server) handleItemList(c *router.Context) {
 		}
 		newestFirst := query.Get("oldest_first") != "true"
 
-		items := s.db.ListItems(filter, perPage+1, newestFirst)
+		items := s.db.ListItems(filter, perPage+1, newestFirst, false)
 		hasMore := false
 		if len(items) == perPage+1 {
 			hasMore = true
